@@ -1,34 +1,65 @@
 # Q Learning
-## ŠT—v
-TDŒë·‚ÉŠî‚Ã‚¢‚Äs“®‰¿’lŠÖ”Q‚ğXV‚·‚éTDŠwK‚Ìˆê‚ÂB
+## æ¦‚è¦
+TDèª¤å·®ã«åŸºã¥ã„ã¦è¡Œå‹•ä¾¡å€¤é–¢æ•°Qã‚’æ›´æ–°ã™ã‚‹TDå­¦ç¿’ã®ä¸€ã¤ã€‚
 
-Œãq‚ÌXV®‚Ì’Ê‚èAÀÛ‚ÉÌ—p‚µ‚Ä‚¢‚È‚¢s“®‚ğ—˜—p‚µ‚Ä‚¢‚é‚Ì‚ÅA•ûôƒIƒtŒ^‚Å‚ ‚é‚±‚Æ‚ª‚í‚©‚é
+å¾Œè¿°ã®æ›´æ–°å¼ã®é€šã‚Šã€å®Ÿéš›ã«æ¡ç”¨ã—ã¦ã„ãªã„è¡Œå‹•ã‚’åˆ©ç”¨ã—ã¦ã„ã‚‹ã®ã§ã€æ–¹ç­–ã‚ªãƒ•å‹ã§ã‚ã‚‹ã“ã¨ãŒã‚ã‹ã‚‹
 
-—LŒÀƒ}ƒ‹ƒRƒtŒˆ’è‰ß’ö‚É‚¨‚¢‚Ä‘S‚Ä‚Ìó‘Ô‚ª\•ª‚ÉƒTƒ“ƒvƒŠƒ“ƒO‚Å‚«‚é‚æ‚¤‚ÈƒGƒsƒ\[ƒh‚ğ–³ŒÀ‰ñ{s‚µ‚½ê‡AÅ“K‚È•]‰¿’l‚Éû‘©‚·‚é‚±‚Æ‚ª—˜_“I‚ÉØ–¾‚³‚ê‚Ä‚¢‚éB
+æœ‰é™ãƒãƒ«ã‚³ãƒ•æ±ºå®šéç¨‹ã«ãŠã„ã¦å…¨ã¦ã®çŠ¶æ…‹ãŒååˆ†ã«ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã§ãã‚‹ã‚ˆã†ãªã‚¨ãƒ”ã‚½ãƒ¼ãƒ‰ã‚’ç„¡é™å›æ–½è¡Œã—ãŸå ´åˆã€æœ€é©ãªè©•ä¾¡å€¤ã«åæŸã™ã‚‹ã“ã¨ãŒç†è«–çš„ã«è¨¼æ˜ã•ã‚Œã¦ã„ã‚‹ã€‚
 
-QlF https://ja.wikipedia.org/wiki/Q%E5%AD%A6%E7%BF%92
+å‚è€ƒï¼š https://ja.wikipedia.org/wiki/Q%E5%AD%A6%E7%BF%92
 
-## XV®
+## æ›´æ–°å¼
 
 
 ```math
-Q(s,a)©Q(s,a)+\alpha(r+\gamma max_{a'}Q(s', a') - Q(s,a))
+Q(s,a)â†Q(s,a)+\alpha(r+\gamma max_{a'}Q(s', a') - Q(s,a))
 ```
 
-## À‘•
+## å®Ÿè£…
 
-Qƒe[ƒuƒ‹‚ğ’¼Ú’è‹`‚·‚é‚Ì‚ÅŠÏ‘ª‚µ‚½˜A‘±’l‚Í—£U’l‚É•ÏŠ·‚·‚é•K—v‚ª‚ ‚é
+Qãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ç›´æ¥å®šç¾©ã™ã‚‹ã®ã§è¦³æ¸¬ã—ãŸé€£ç¶šå€¤ã¯é›¢æ•£å€¤ã«å¤‰æ›ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
 
 ```python
-# observation:              Œ‹‰Ê“¾‚ç‚ê‚½V‚½‚Èó‘Ô
-# self.observation_space:   Agent‚ª‚ ‚ç‚©‚¶‚ß—^‚¦‚ç‚ê‚Ä‚¢‚éó‘Ô‹óŠÔ‚Ìî•ñ
-# self.discretize_nums:     ó‘Ô‹óŠÔ‚ğ‚Ç‚Ì‚æ‚¤‚É•ªŠ„‚·‚é‚©‚ğ‚ ‚ç‚í‚·•Ï”
+# observation:              çµæœå¾—ã‚‰ã‚ŒãŸæ–°ãŸãªçŠ¶æ…‹
+# self.observation_space:   AgentãŒã‚ã‚‰ã‹ã˜ã‚ä¸ãˆã‚‰ã‚Œã¦ã„ã‚‹çŠ¶æ…‹ç©ºé–“ã®æƒ…å ±
+# self.discretize_nums:     çŠ¶æ…‹ç©ºé–“ã‚’ã©ã®ã‚ˆã†ã«åˆ†å‰²ã™ã‚‹ã‹ã‚’ã‚ã‚‰ã‚ã™å¤‰æ•°
 next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
 ```
 
-Qƒe[ƒuƒ‹‚ÌXV
+Qãƒ†ãƒ¼ãƒ–ãƒ«ã®æ›´æ–°
 ```
 def update_q_table(self, reward, next_state) -> None:
         td_error = reward + self.gamma*np.max(self.q_table[next_state]) - self.q_table[self.state, self.action]
         self.q_table[self.state, self.action] += self.alpha*td_error
 ```
+
+## å®Ÿé¨“çµæœ
+### çŠ¶æ…‹ã€å ±é…¬è¨­è¨ˆ
+https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
+```
+Observation:
+        Type: Box(4)
+        Num     Observation               Min                     Max
+        0       Cart Position             -4.8                    4.8
+        1       Cart Velocity             -Inf                    Inf
+        2       Pole Angle                -0.418 rad (-24 deg)    0.418 rad (24 deg)
+        3       Pole Angular Velocity     -Inf                    Inf
+```
+åˆ†å‰²æ•°ã¯é †ã«8,2,8,2(infã¯8åˆ†å‰²ã—ã¦ã‚‚ã»ã¼æ„å‘³ãªã„ã®ã§)
+
+```
+Reward:
+        Reward is 1 for every step taken, including the termination step
+        ï¼‹ 195stepä»¥ä¸‹ã§å¤±æ•—ã—ãŸå ´åˆ-200
+```
+
+### æ¢ç´¢ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
+Îµ-greedyæ³•
+```
+epsilon = 1 / episode
+```
+
+### ã‚°ãƒ©ãƒ•
+ç›´è¿‘10ã‚¹ãƒ†ãƒƒãƒ—ã§ã®å¹³å‡
+ç¨€ã«ã»ã¼200ã¿ãŸã„ãªæ™‚ãŒã‚ã‚‹ã‘ã©ã ã„ãŸã„ã“ã‚“ãªæ„Ÿã˜
+![result1](https://user-images.githubusercontent.com/32331100/90546872-a322df80-e1c5-11ea-8d01-f44f9a52812e.png)
