@@ -28,12 +28,16 @@ next_state = discretize_Box_state(observation, self.observation_space, self.disc
 
 Qテーブルの更新
 ```
+# self.state: next_stateの一個前の状態
+# self.action: self.stateにてとった行動
 def update_q_table(self, reward, next_state) -> None:
         td_error = reward + self.gamma*np.max(self.q_table[next_state]) - self.q_table[self.state, self.action]
         self.q_table[self.state, self.action] += self.alpha*td_error
 ```
 
 ## 実験結果
+Qテーブルは-0.1~0.1でランダムに初期化
+
 ### 状態、報酬設計
 https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
 ```
@@ -45,7 +49,7 @@ Observation:
         2       Pole Angle                -0.418 rad (-24 deg)    0.418 rad (24 deg)
         3       Pole Angular Velocity     -Inf                    Inf
 ```
-分割数は順に8,2,8,2(infは8分割してもほぼ意味ないので)
+状態の分割数は順に8,2,8,2(infは8分割してもほぼ意味ないので)
 
 ```
 Reward:
