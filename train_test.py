@@ -8,12 +8,7 @@ env = gym.make('CartPole-v0')
 max_steps = 200
 episode_num = 1500
 
-env.observation_space.high[1]=2
-env.observation_space.low[1]=-2
-env.observation_space.high[3]=2
-env.observation_space.low[3]=-2
-
-agent = Qlearning(8, env.observation_space, env.action_space, init_q_max=0.01)
+agent = Qlearning([8,2,8,2], env.observation_space, env.action_space, init_q_max=0.01)
 
 def compute_reward(reward, done):
     if done:
@@ -55,8 +50,9 @@ for episode in range(episode_num):
 
     
 plt.plot(range(1 + episode), ave_10_episodes_reward)
+plt.xlabel('episodes [1, 1500]')
+plt.ylabel('reward')
 plt.show()
-plt.pause(0.001)
 
 for i in range(5):
     obs = env.reset()
