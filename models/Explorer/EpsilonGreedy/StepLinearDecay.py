@@ -3,7 +3,26 @@ from typing import Callable
 from models.Explorer.Explorer import Explorer
 
 class StepLinearDecay(Explorer):
+    """
+    一つのエピソード内でステップ数が進むごとに、εが直線的に減少していくε-greedy法
+
+    epsilon = - a * step + start_epsilon (epsilon in [end_epsilon, start_epsilon])
+
+    Examples:
+        explorer = EpisodeLinearDecay(decay_steps=100, start_epsilon=0.7, end_epsilon=0.01)
+        agent = Agent(explorer=explorer, args...)
+    """
+
     def __init__(self, decay_steps:int, start_epsilon:float=1.0, end_epsilon:float=0.0):
+        """
+        コンストラクタ
+
+        Args:
+            decay_steps (int): start_epsilonからend_epsilonに至るまでにかかるステップ数
+            start_episilon (float): εの初期値
+            end_epsilon (float): εが減少する最小値
+        """
+
         assert start_epsilon >= end_epsilon, "'start_epsilon' must be equal to or greater than 'end_epsilon'"
         super(StepLinearDecay, self).__init__()
         self.epsilon = start_epsilon
