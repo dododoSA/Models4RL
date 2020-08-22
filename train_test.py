@@ -1,14 +1,20 @@
-from models.Qlearning.Qlearning import Qlearning
+from models.Agents.Qlearning.Qlearning import Qlearning
+from models.Explorer.EpsilonGreedy.ConstantEpsilonGreedy import ConstantEpsilonGreedy
+from models.Explorer.EpsilonGreedy.EpisodeLinearDecay import EpisodeLinearDecay
 import gym
 import time
 import numpy as np
 import collections
 import matplotlib.pyplot as plt
+
+
 env = gym.make('CartPole-v0')
 max_steps = 200
-episode_num = 1500
+episode_num = 2000
 
-agent = Qlearning([8,2,8,2], env.observation_space, env.action_space, init_q_max=0.01)
+explorer = EpisodeLinearDecay(episode_num - 100, 1, 0)
+
+agent = Qlearning([9,2,8,2], env.observation_space, env.action_space, explorer, init_q_max=0.01)
 
 def compute_reward(reward, done):
     if done:

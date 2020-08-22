@@ -2,6 +2,7 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.box import Box
 import numpy as np
 from typing import List, Union
+from models.Explorer import Explorer
 
 def bins(clip_min:float, clip_max:float, num:int) -> np.ndarray:
     return np.linspace(clip_min, clip_max, num+1)[1:-1]
@@ -33,9 +34,11 @@ class Qlearning():
     def __init__(
                     self, 
                     discretize_nums:Union[int, List[int], np.ndarray], 
-                    observation_space:Union[Box], 
+                    observation_space:Box, 
                     action_space:Discrete, 
-                    alpha:float=0.5, gamma:float=0.99, 
+                    explorer:Explorer,
+                    alpha:float=0.5,
+                    gamma:float=0.99, 
                     init_q_max:float=1.0
                 ):
         """
@@ -54,12 +57,12 @@ class Qlearning():
         state_num = observation_space.shape[0] # self付けるかどうか問題
         self.action_space = action_space
         self.action_num = action_space.n
+        self.explorer = explorer
         self.alpha = alpha
         self.gamma = gamma
 
         self.state = None
         self.action = None
-        self.episode = 0
 
         if type(discretize_nums) == int:
             self.discretize_nums = np.full((state_num), discretize_nums)
@@ -106,7 +109,8 @@ class Qlearning():
             
         # 行動を起こす前の状態と、起こした行動を保存
         self.state = next_state
-        self.action = self.act_by_epsilon_greedy(next_state)
+        self.action = self.explorer.explore(self.action_space.sample, lambda: self._choice_greedy_action(next_state))
+        # self.action = self.act_by_epsilon_greedy(next_state)
 
         return self.action
 
@@ -125,25 +129,29 @@ class Qlearning():
         self.q_table[self.state, self.action] += self.alpha*td_error
 
 
-    def act_by_epsilon_greedy(self, next_state) -> int:
-        """
-        ε-greedy法に基づく探索
-        ここはクラス化してコンストラクタから指定する可能性あり
-        """
-        epsilon = 1 / (self.episode + 1)
-        self.episode += 1
+    #def act_by_epsilon_greedy(self, next_state) -> int:
+    #    """
+    #    ε-greedy法に基づく探索
+    #    ここはクラス化してコンストラクタから指定する可能性あり
+    #    """
+    #    epsilon = 1 / (self.episode + 1)
+    #    self.episode += 1
 
-        if epsilon <= np.random.uniform(0, 1):
-            action = np.argmax(self.q_table[next_state])
-        else:
-            action = self.action_space.sample()
+    #    if epsilon <= np.random.uniform(0, 1):
+    #        action = np.argmax(self.q_table[next_state])
+    #    else:
+    #        action = self.action_space.sample()
         
-        return action
+    #    return action
 
-    def act_greedy(self, observation):
-        next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
+    def _choice_greedy_action(self, next_state:int) -> int:
         return np.argmax(self.q_table[next_state])
 
-    def stop_episode_and_train(self, observation, reward):
+    def act_greedy(self, observation:np.ndarray) -> None:
+        next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
+        return self._choice_greedy_action(next_state)
+
+    def stop_episode_and_train(self, observation:np.ndarray, reward:float) -> None:
         next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
         self.update_q_table(reward, next_state)
+        self.explorer.end_episode()
