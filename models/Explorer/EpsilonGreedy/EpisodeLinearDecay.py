@@ -4,7 +4,7 @@ from models.Explorer.Explorer import Explorer
 
 class EpisodeLinearDecay(Explorer):
     """
-    直線的にεが減少していくε-greedy法
+    エピソード数が増えるごとに、直線的にεが減少していくε-greedy法
 
     epsilon = - a * episode + start_epsilon (epsilon in [end_epsilon, start_epsilon])
     
