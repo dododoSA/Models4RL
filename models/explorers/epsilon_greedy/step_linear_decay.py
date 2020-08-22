@@ -2,7 +2,7 @@ import numpy as np
 from typing import Callable
 from models.explorers.base_explorer import BaseExplorer
 
-class StepLinearDecay(BaseExplorerr):
+class StepLinearDecay(BaseExplorer):
     """
     一つのエピソード内でステップ数が進むごとに、εが直線的に減少していくε-greedy法
 

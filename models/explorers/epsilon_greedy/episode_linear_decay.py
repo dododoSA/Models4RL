@@ -44,7 +44,6 @@ class EpisodeLinearDecay(BaseExplorer):
         return action
 
     def end_episode(self):
-        print(self.epsilon)
         self.episode += 1
 
         if self.episode < self.decay_episodes:

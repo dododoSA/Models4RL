@@ -2,32 +2,8 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.box import Box
 import numpy as np
 from typing import List, Union
-from models.Explorer import Explorer
-
-def bins(clip_min:float, clip_max:float, num:int) -> np.ndarray:
-    return np.linspace(clip_min, clip_max, num+1)[1:-1]
-
-def generate_state_index(discretized, discretized_nums) -> int:
-    index = 0
-    for i, x in enumerate(discretized):
-        digit = 1
-        for j in range(i):
-            digit *= discretized_nums[j]
-        index += x * digit
-
-    return index
-
-
-def discretize_Box_state(observation:np.ndarray, observation_space:Box, discretize_nums:np.ndarray) -> int:
-    def digitize_state(i, state):
-        return np.digitize(state, bins=bins(observation_space.low[i], observation_space.high[i], discretize_nums[i]))
-        
-    discretized = np.array([], dtype=int)
-    for i, state in enumerate(observation):
-        discretized = np.append(discretized, digitize_state(i, state))
-    # discretized = map(digitize_state, ) 出来ればmapで実装したい
-
-    return generate_state_index(discretized, discretize_nums)
+from models.explorers.base_explorer import BaseExplorer
+from models.utils.discretizer import *
 
 
 class Qlearning():
@@ -36,7 +12,7 @@ class Qlearning():
                     discretize_nums:Union[int, List[int], np.ndarray], 
                     observation_space:Box, 
                     action_space:Discrete, 
-                    explorer:Explorer,
+                    explorer:BaseExplorer,
                     alpha:float=0.5,
                     gamma:float=0.99, 
                     init_q_max:float=1.0
@@ -128,21 +104,6 @@ class Qlearning():
         td_error = reward + self.gamma*np.max(self.q_table[next_state]) - self.q_table[self.state, self.action]
         self.q_table[self.state, self.action] += self.alpha*td_error
 
-
-    #def act_by_epsilon_greedy(self, next_state) -> int:
-    #    """
-    #    ε-greedy法に基づく探索
-    #    ここはクラス化してコンストラクタから指定する可能性あり
-    #    """
-    #    epsilon = 1 / (self.episode + 1)
-    #    self.episode += 1
-
-    #    if epsilon <= np.random.uniform(0, 1):
-    #        action = np.argmax(self.q_table[next_state])
-    #    else:
-    #        action = self.action_space.sample()
-        
-    #    return action
 
     def _choice_greedy_action(self, next_state:int) -> int:
         return np.argmax(self.q_table[next_state])

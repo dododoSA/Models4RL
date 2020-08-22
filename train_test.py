@@ -1,8 +1,8 @@
-from models.Agents.Qlearning.Qlearning import Qlearning
-from models.Explorer.EpsilonGreedy.ConstantEpsilon import ConstantEpsilon
-from models.Explorer.EpsilonGreedy.EpisodeLinearDecay import EpisodeLinearDecay
-from models.Explorer.EpsilonGreedy.StepLinearDecay import StepLinearDecay
-from models.Explorer.EpsilonGreedy.EpisodeExpDecay import EpisodeExpDecay
+from models.agents.q_learning.q_learning import Qlearning
+from models.explorers.epsilon_greedy.constant_epsilon import ConstantEpsilon
+from models.explorers.epsilon_greedy.episode_linear_decay import EpisodeLinearDecay
+from models.explorers.epsilon_greedy.step_linear_decay import StepLinearDecay
+from models.explorers.epsilon_greedy.episode_exp_decay import EpisodeExpDecay
 import gym
 import time
 import numpy as np

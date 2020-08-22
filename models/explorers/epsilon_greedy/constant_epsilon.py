@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Callable
-from models.explorer.explorer import Explorer
+from models.explorers.base_explorer import BaseExplorer
 
-class ConstantEpsilon(Explorer):
+class ConstantEpsilon(BaseExplorer):
     """
     イプシロンが定数値のε-greedy法
     ε = const
