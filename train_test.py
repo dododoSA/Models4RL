@@ -2,6 +2,7 @@ from models.Agents.Qlearning.Qlearning import Qlearning
 from models.Explorer.EpsilonGreedy.ConstantEpsilon import ConstantEpsilon
 from models.Explorer.EpsilonGreedy.EpisodeLinearDecay import EpisodeLinearDecay
 from models.Explorer.EpsilonGreedy.StepLinearDecay import StepLinearDecay
+from models.Explorer.EpsilonGreedy.EpisodeExpDecay import EpisodeExpDecay
 import gym
 import time
 import numpy as np
@@ -13,8 +14,10 @@ env = gym.make('CartPole-v0')
 max_steps = 200
 episode_num = 2000
 
-explorer = EpisodeLinearDecay(episode_num - 100, 0.6, 0)
-#explorer = StepLinearDecay(max_steps - 70, 0.7, 0)
+explorer = EpisodeLinearDecay(1000, 0.01, 0)
+#explorer = StepLinearDecay(max_steps - 100, 0.1, 0)
+#explorer = EpisodeExpDecay(a=0.99)
+#explorer = ConstantEpsilon(0)
 
 agent = Qlearning([9,2,8,2], env.observation_space, env.action_space, explorer, init_q_max=0.01)
 

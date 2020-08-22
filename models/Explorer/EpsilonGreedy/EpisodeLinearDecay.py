@@ -4,6 +4,8 @@ from models.Explorer.Explorer import Explorer
 
 class EpisodeLinearDecay(Explorer):
     def __init__(self, decay_episodes:int, start_epsilon:float=1.0, end_epsilon:float=0.0):
+        assert start_epsilon >= end_epsilon, "'start_epsilon' must be equal to or greater than 'end_epsilon'"
+
         super(EpisodeLinearDecay, self).__init__()
         self.epsilon = start_epsilon
         self.start_epsilon = start_epsilon
@@ -20,6 +22,7 @@ class EpisodeLinearDecay(Explorer):
         return action
 
     def end_episode(self):
+        print(self.epsilon)
         self.episode += 1
 
         if self.episode < self.decay_episodes:
