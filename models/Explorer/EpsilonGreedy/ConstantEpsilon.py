@@ -2,7 +2,10 @@ import numpy as np
 from typing import Callable
 from models.Explorer.Explorer import Explorer
 
-class ConstantEpsilonGreedy(Explorer):
+class ConstantEpsilon(Explorer):
+    """
+
+    """
     def __init__(self, epsilon=0.1):
         super(ConstantEpsilonGreedy, self).__init__()
         self.epsilon = epsilon
