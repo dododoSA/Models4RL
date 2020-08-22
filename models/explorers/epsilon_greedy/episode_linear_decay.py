@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Callable
-from models.Explorer.Explorer import Explorer
+from models.explorers.base_explorer import BaseExplorer
 
-class EpisodeLinearDecay(Explorer):
+class EpisodeLinearDecay(BaseExplorer):
     """
     エピソード数が増えるごとに、直線的にεが減少していくε-greedy法
 

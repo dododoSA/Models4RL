@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Callable
 
-class Explorer(metaclass=ABCMeta):
+class BaseExplorer(metaclass=ABCMeta):
     def __init__(self):
         pass
 

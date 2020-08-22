@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Callable
-from models.Explorer.Explorer import Explorer
+from models.explorer.explorer import Explorer
 
 class ConstantEpsilon(Explorer):
     """

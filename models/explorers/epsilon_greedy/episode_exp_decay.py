@@ -1,8 +1,8 @@
 import numpy as np
 from typing import Callable
-from models.Explorer.Explorer import Explorer
+from models.explorers.base_explorer import BaseExplorer
 
-class EpisodeExpDecay(Explorer):
+class EpisodeExpDecay(BaseExplorer):
     """
     エピソード数が増えるごとに、指数関数的にεが減少していくε-greedy法
 
