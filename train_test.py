@@ -57,7 +57,7 @@ for episode in range(episode_num):
 
 
     agent.stop_episode_and_train(obs, reward)
-    print("episode: " + str(episode) + " episode reward: " + str(episode_reward))
+    print("episode: ", episode, " episode reward: ", episode_reward)
 
     
 plt.plot(range(1 + episode), ave_10_episodes_reward)
@@ -83,4 +83,4 @@ for i in range(5):
         episode_reward += reward
         t += 1
         
-    print("episode: " + str(i) + " episode reward: " + str(episode_reward))
+    print("episode: ", i, " episode reward: ", episode_reward)
