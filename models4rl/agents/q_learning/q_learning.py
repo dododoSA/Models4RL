@@ -2,8 +2,8 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.box import Box
 import numpy as np
 from typing import List, Union
-from models.explorers.base_explorer import BaseExplorer
-from models.utils.discretizer import *
+from models4rl.explorers.base_explorer import BaseExplorer
+from models4rl.utils.discretizer import *
 
 
 class Qlearning():
