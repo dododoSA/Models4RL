@@ -4,9 +4,11 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
 
+from models4rl.replay_buffers.replay_buffer import ReplayBuffer
+
 obs_num = 4 # 仮
 node_num = 128 # 仮
-act_num = 2
+act_num = 2 # 仮
 
 class Q_Network(nn.Module):
     def __init__(self):
@@ -23,15 +25,15 @@ class Q_Network(nn.Module):
         y = F.relu(self.fc4(h))
         return y
 
-class ReplayMemory:
-    def __init__(self):
-        self.memory = []
 
-    def sample():
-        pass
 
 
 class DQN():
     def __init__():
-        pass
+        self.q_network = Q_Network()
+        self.replay_memory = ReplayBuffer(10000)
 
+        self.optimizer = optim.Adam(self.q_netwark.parameters(), lr=0.0001)
+
+    def act_and_train():
+        pass
