@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Callable
-from models.explorers.base_explorer import BaseExplorer
+from models4rl.explorers.base_explorer import BaseExplorer
 
 class EpisodeExpDecay(BaseExplorer):
     """

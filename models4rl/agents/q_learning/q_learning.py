@@ -80,8 +80,7 @@ class Qlearning():
         """
         next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
 
-        if self.state != None and self.action != None:
-            self.update_q_table(reward, next_state)
+        self.update_q_table(reward, next_state)
             
         # 行動を起こす前の状態と、起こした行動を保存
         self.state = next_state
@@ -101,8 +100,9 @@ class Qlearning():
         Returns:
             None
         """
-        td_error = reward + self.gamma*np.max(self.q_table[next_state]) - self.q_table[self.state, self.action]
-        self.q_table[self.state, self.action] += self.alpha*td_error
+        if self.state != None and self.action != None:
+            td_error = reward + self.gamma*np.max(self.q_table[next_state]) - self.q_table[self.state, self.action]
+            self.q_table[self.state, self.action] += self.alpha*td_error
 
 
     def _choice_greedy_action(self, next_state:int) -> int:
@@ -116,3 +116,6 @@ class Qlearning():
         next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
         self.update_q_table(reward, next_state)
         self.explorer.end_episode()
+
+        self.action = None
+        self.state = None
