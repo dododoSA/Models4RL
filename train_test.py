@@ -113,7 +113,7 @@ for i in range(5):
     while not done:
         env.render()
 
-        action = agent.act_greedy(obs)
+        action = agent.act_greedily(obs)
 
         obs, reward, done, _ = env.step(action)
 

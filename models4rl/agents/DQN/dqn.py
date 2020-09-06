@@ -1,3 +1,4 @@
+from models4rl.agents.base_agent import BaseAgent
 from models4rl.replay_buffers.replay_buffer import ReplayBuffer
 
 import torch
@@ -5,7 +6,7 @@ import copy
 
 
 
-class DQN():
+class DQN(BaseAgent):
     def __init__(
         self,
         action_space,
@@ -22,21 +23,18 @@ class DQN():
         assert target_update_step_interval >= 0, 'target_update_step_interval must be positive or 0.'
         assert target_update_episode_interval > 0, 'target_update_episode_interval must be positive.'
 
+        super(DQN, self).__init__(action_space, explorer, gamma)
+
         self.q_network = q_network
         self.optimizer = optimizer
         self.criterion = criterion
         
         self.target_network = copy.deepcopy(self.q_network)
-        
-        self.explorer = explorer
 
         self.replay_buffer = replay_buffer
         self.batch_size = batch_size
 
-        self.gamma = gamma
 
-
-        self.action_space = action_space
         self.state = None
         self.action = None
         self.target_update_step_interval = target_update_step_interval
@@ -97,7 +95,7 @@ class DQN():
             action = self.q_network(observation).max(0)[1].item()
         return action
 
-    def act_greedy(self, observation):
+    def act_greedily(self, observation):
         next_state = torch.tensor(observation).float()
         return self._choice_greedy_action(next_state)
 

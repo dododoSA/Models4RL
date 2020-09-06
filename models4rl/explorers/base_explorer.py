@@ -7,8 +7,8 @@ class BaseExplorer(metaclass=ABCMeta):
 
     @abstractmethod
     def explore(self, random_action_func:Callable[[], int], greedy_action_func:Callable[[], int]) -> int:
-        return 0
+        raise NotImplementedError()
 
     @abstractmethod
     def end_episode(self):
-        pass
+        raise NotImplementedError()

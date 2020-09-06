@@ -2,11 +2,12 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.box import Box
 import numpy as np
 from typing import List, Union
+from models4rl.agents.base_agent import BaseAgent
 from models4rl.explorers.base_explorer import BaseExplorer
 from models4rl.utils.discretizer import *
 
 
-class Qlearning():
+class Qlearning(BaseAgent):
     def __init__(
                     self, 
                     discretize_nums:Union[int, List[int], np.ndarray], 
@@ -28,14 +29,12 @@ class Qlearning():
             gamma (float):                       割引率, 初期値0.99
             init_q_max (float)                   q_tableの初期値のしきい値 |q| <= init_q_max
         """
+        super(Qlearning, self).__init__(action_space, explorer, gamma)
+
         self.discretize_nums = discretize_nums
         self.observation_space = observation_space
         state_num = observation_space.shape[0] # self付けるかどうか問題
-        self.action_space = action_space
-        self.action_num = action_space.n
-        self.explorer = explorer
         self.alpha = alpha
-        self.gamma = gamma
 
         self.state = None
         self.action = None
@@ -108,7 +107,7 @@ class Qlearning():
     def _choice_greedy_action(self, next_state:int) -> int:
         return np.argmax(self.q_table[next_state])
 
-    def act_greedy(self, observation:np.ndarray) -> None:
+    def act_greedily(self, observation:np.ndarray) -> int:
         next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
         return self._choice_greedy_action(next_state)
 
