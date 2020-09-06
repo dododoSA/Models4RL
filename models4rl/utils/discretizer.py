@@ -4,6 +4,7 @@ from gym.spaces.box import Box
 def bins(clip_min:float, clip_max:float, num:int) -> np.ndarray:
     return np.linspace(clip_min, clip_max, num+1)[1:-1]
 
+
 def generate_state_index(discretized, discretized_nums) -> int:
     index = 0
     for i, x in enumerate(discretized):

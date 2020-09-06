@@ -35,7 +35,8 @@ class EpisodeLinearDecay(BaseExplorer):
         self.decay_episodes = decay_episodes
         self.episode = 1
 
-    def explore(self, random_action_func:Callable[[], int], greedy_action_func:Callable[[], int]):
+
+    def explore(self, random_action_func:Callable[[], int], greedy_action_func:Callable[[], int]) -> int:
         if np.random.uniform(0, 1) <= self.epsilon:
             action = random_action_func()
         else:
@@ -43,7 +44,8 @@ class EpisodeLinearDecay(BaseExplorer):
 
         return action
 
-    def end_episode(self):
+
+    def end_episode(self) -> None:
         self.episode += 1
 
         if self.episode < self.decay_episodes:

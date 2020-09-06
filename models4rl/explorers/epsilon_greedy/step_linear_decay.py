@@ -31,7 +31,8 @@ class StepLinearDecay(BaseExplorer):
         self.decay_steps = decay_steps
         self.step = 1
 
-    def explore(self, random_action_func:Callable[[], int], greedy_action_func:Callable[[], int]):
+
+    def explore(self, random_action_func:Callable[[], int], greedy_action_func:Callable[[], int]) -> int:
         if np.random.uniform(0, 1) <= self.epsilon:
             action = random_action_func()
         else:
@@ -41,11 +42,13 @@ class StepLinearDecay(BaseExplorer):
 
         return action
 
-    def end_episode(self):
+
+    def end_episode(self) -> None:
         self.step = 1
         self.epsilon = self.start_epsilon
 
-    def _update_epsilon(self):
+
+    def _update_epsilon(self) -> None:
         self.step += 1
 
         if self.step < self.decay_steps:

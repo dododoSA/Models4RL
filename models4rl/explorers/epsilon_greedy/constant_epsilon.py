@@ -24,6 +24,7 @@ class ConstantEpsilon(BaseExplorer):
         super(ConstantEpsilon, self).__init__()
         self.epsilon = epsilon
 
+
     def explore(self, random_action_func:Callable[[], int], greedy_action_func:Callable[[], int]) -> int:
         if np.random.uniform(0, 1) <= self.epsilon:
             action = random_action_func()
@@ -32,5 +33,6 @@ class ConstantEpsilon(BaseExplorer):
 
         return action
 
-    def end_episode(self):
+
+    def end_episode(self) -> None:
         pass

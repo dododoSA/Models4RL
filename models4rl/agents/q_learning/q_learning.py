@@ -25,6 +25,7 @@ class Qlearning(BaseAgent):
             discritize_num (int or list of int): 状態の次元ごとに分割数を指定。整数値が与えられた場合、全て値の等しいlistが与えられることと同じ。
             observation_space (Box):             環境の状態空間 env.observation_spaceをそのまま渡せばOK、Boxのみ可
             action_space (Discrete):             行動空間 env.action_spaceをそのまま渡せばOK、一次元離散値
+            explorer (BaseExplorer):             探索アルゴリズム
             alpha (float):                       学習率,初期値0.5
             gamma (float):                       割引率, 初期値0.99
             init_q_max (float)                   q_tableの初期値のしきい値 |q| <= init_q_max
@@ -52,6 +53,7 @@ class Qlearning(BaseAgent):
             self.all_state_num *= self.discretize_nums[i]
 
         self.q_table = np.random.uniform(low=-init_q_max, high=init_q_max, size=(self.all_state_num, self.action_num))
+
 
     def act_and_train(self, observation:np.ndarray, reward:float) -> int:
         """
@@ -88,6 +90,7 @@ class Qlearning(BaseAgent):
 
         return self.action
 
+
     def update_q_table(self, reward, next_state) -> None:
         """
         Q関数の更新
@@ -107,11 +110,20 @@ class Qlearning(BaseAgent):
     def _choice_greedy_action(self, next_state:int) -> int:
         return np.argmax(self.q_table[next_state])
 
+
     def act_greedily(self, observation:np.ndarray) -> int:
         next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
         return self._choice_greedy_action(next_state)
 
+
     def stop_episode_and_train(self, observation:np.ndarray, reward:float) -> None:
+        """
+        エピソード終了時の処理(学習も行う)
+
+        Args:
+            observation (ndarray): 観測した状態
+            reward (float):        即時報酬
+        """
         next_state = discretize_Box_state(observation, self.observation_space, self.discretize_nums)
         self.update_q_table(reward, next_state)
         self.explorer.end_episode()
