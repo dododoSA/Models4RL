@@ -89,7 +89,15 @@ class DQN(BaseAgent):
         """
         next_state = torch.tensor(observation).float()
         
-        self.replay_buffer.append(self.state, self.action, next_state, reward)
+        self.replay_buffer.append_and_update(
+            self.state,
+            self.action,
+            next_state,
+            reward,
+            q_network=self.q_network,
+            target_network=self.target_network,
+            gamma=self.gamma
+        )
         self.replay()
 
         if self.target_update_step_interval and self.step % self.target_update_step_interval == 0:
@@ -106,17 +114,17 @@ class DQN(BaseAgent):
         if len(self.replay_buffer) < self.batch_size:
             return
 
-        state_batch, next_state_batch, action_batch, reward_batch = self.replay_buffer.sample(self.batch_size).values()
+        state_batch, next_state_batch, action_batch, reward_batch = self.replay_buffer.get_batch(self.batch_size).values()
         
 
         self.q_network.eval()
 
         q_values = self.q_network(state_batch).gather(1, action_batch)
-        next_q_values = torch.zeros_like(q_values, dtype=float)
-
+        
 
         self.target_network.eval()
 
+        next_q_values = torch.zeros_like(q_values, dtype=float)
         next_q_values = self.target_network(next_state_batch).max(1)[0].detach()
         target_values = self.gamma * next_q_values + reward_batch
 
@@ -157,7 +165,16 @@ class DQN(BaseAgent):
             reward (float):        即時報酬
         """
         next_state = torch.tensor(observation).float()
-        self.replay_buffer.append(self.state, self.action, next_state, reward)
+        
+        self.replay_buffer.append_and_update(
+            self.state,
+            self.action,
+            next_state,
+            reward,
+            q_network=self.q_network,
+            target_network=self.target_network,
+            gamma=self.gamma
+        )
         self.replay()
         self.explorer.end_episode()
         

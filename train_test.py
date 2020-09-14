@@ -5,6 +5,7 @@ from models4rl.explorers.epsilon_greedy.episode_linear_decay import EpisodeLinea
 from models4rl.explorers.epsilon_greedy.step_linear_decay import StepLinearDecay
 from models4rl.explorers.epsilon_greedy.episode_exp_decay import EpisodeExpDecay
 from models4rl.replay_buffers.replay_buffer import ReplayBuffer
+from models4rl.replay_buffers.prioritized_replay_buffer import PrioritizedReplayBuffer
 import gym
 import time
 import numpy as np
@@ -25,10 +26,10 @@ env = gym.make('CartPole-v0')
 max_steps = 200
 episode_num = 1000
 
-explorer = EpisodeLinearDecay(500, 0.7, 0)
+explorer = EpisodeLinearDecay(700, 0.8, 0)
 #explorer = StepLinearDecay(max_steps - 100, 0.1, 0)
 #explorer = EpisodeExpDecay(a=0.99)
-#explorer = ConstantEpsilon(0)
+# explorer = ConstantEpsilon(0.05)
 
 # agent = Qlearning([9,2,8,2], env.observation_space, env.action_space,
 # explorer, init_q_max=0.01)
@@ -56,14 +57,14 @@ class Q_Network(nn.Module):
 q_network = Q_Network()
 optimizer = optim.Adam(q_network.parameters(), lr=0.001)
 criterion = nn.MSELoss()
-replay_buffer = ReplayBuffer(1000)
-agent = DQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_episode_interval=15
-            )
+#replay_buffer = ReplayBuffer(1000)
+replay_buffer = PrioritizedReplayBuffer(3000)
+agent = DQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_episode_interval=20)
 
 def compute_reward(reward, done):
     if done:
         if t < max_steps - 5:
-            reward = -10
+            reward = -5
         else:
             reward = 1
     return reward
