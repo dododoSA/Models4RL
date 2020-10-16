@@ -16,7 +16,7 @@ class ReplayBuffer(BaseBuffer):
     def __init__(self, capacity):
         self.experience_memory = ExperienceMemory(capacity)
 
-    def append_and_update(self, state, action, next_state, reward, **keys):
+    def append_and_update(self, state, action, next_state, reward, **keys={}):
         if state is None or action is None:
             return
 

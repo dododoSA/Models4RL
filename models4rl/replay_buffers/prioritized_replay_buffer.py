@@ -7,6 +7,9 @@ from models4rl.replay_buffers.data_memory.experience_memory import ExperienceMem
 from models4rl.replay_buffers.data_memory.tderror_memory import TDerrorMemory
 
 class PrioritizedReplayBuffer(BaseBuffer):
+    """
+    Actor-Critic系には未対応
+    """
     def __init__(self, capacity, start_size=128, epsilon=0.0001):
         self.experience_memory = ExperienceMemory(capacity)
         self.tderror_memory = TDerrorMemory(capacity, epsilon)
