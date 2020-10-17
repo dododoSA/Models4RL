@@ -22,7 +22,7 @@ class ReplayBuffer(BaseBuffer):
 
         transition = {
             "state": state,
-            "action": torch.LongTensor([[action]]), 
+            "action": torch.tensor([action]), 
             "next_state": next_state,
             "reward": reward
         }

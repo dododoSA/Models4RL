@@ -96,10 +96,13 @@ class DQN(BaseAgent):
             target_network=self.target_network,
             gamma=self.gamma
         )
-        self.replay()
 
-        if self.target_update_step_interval and self.step % self.target_update_step_interval == 0:
-            self._update_target_network()
+        
+        if len(self.replay_buffer) < self.batch_size:
+            self.replay()
+
+            if self.target_update_step_interval and self.step % self.target_update_step_interval == 0:
+                self._update_target_network()
 
         self.state = next_state
         self.action = self.explorer.explore(self.action_space.sample, lambda: self._choice_greedy_action(next_state))
@@ -109,9 +112,6 @@ class DQN(BaseAgent):
 
 
     def replay(self):
-        if len(self.replay_buffer) < self.batch_size:
-            return
-
         state_batch, next_state_batch, action_batch, reward_batch = self.replay_buffer.get_batch(self.batch_size).values()
         
 

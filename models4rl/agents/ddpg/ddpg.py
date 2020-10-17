@@ -14,7 +14,7 @@ obs_num = 3 # 仮
 node_num = 128 # 仮
 
 class PolicyNetwork(nn.Module):
-    def __init__():
+    def __init__(self):
         super().__init__()
         self.fc1 = nn.Linear(obs_num, node_num)
         self.fc2 = nn.Linear(node_num, node_num)
@@ -24,15 +24,15 @@ class PolicyNetwork(nn.Module):
         self.act_range = 1
 
     def forward(self, obs):
-        x1 = F.tanh(self.fc1(obs))
-        x2 = F.tanh(self.fc2(x1))
-        x3 = F.tanh(self.fc3(x2))
-        y = F.tanh(self.fc4(x3))
+        x1 = torch.tanh(self.fc1(obs))
+        x2 = torch.tanh(self.fc2(x1))
+        x3 = torch.tanh(self.fc3(x2))
+        y = torch.tanh(self.fc4(x3))
         return self.act_range * y
 
 
 class Q_Network(nn.Module):
-    def __init__():
+    def __init__(self):
         super().__init__()
         self.fc1 = nn.Linear(obs_num + 1, node_num)
         self.fc2 = nn.Linear(node_num, node_num)
@@ -40,11 +40,11 @@ class Q_Network(nn.Module):
         self.fc4 = nn.Linear(node_num, 1)
 
     def forward(self, obs, act):
-        x1 = F.relu(self.fc1(torch.cat([obs, act])))
+        x1 = F.relu(self.fc1(torch.cat([obs, act], dim=-1)))
         x2 = F.relu(self.fc2(x1))
         x3 = F.relu(self.fc3(x2))
         q = F.relu(self.fc4(x3))
-        return q.squeeze(1, -1)
+        return q
 
 
 class ActorCritic(nn.Module):
@@ -81,11 +81,11 @@ class DDPG(BaseAgent):
     ):
         super().__init__(action_space, explorer, gamma=gamma)
 
-        ac = actor_critic
-        ac_target = deepcopy(ac)
+        self.ac = actor_critic
+        self.ac_target = deepcopy(self.ac)
 
         # ↓これって本当に必要なん？
-        for p in ac_target.parameters():
+        for p in self.ac_target.parameters():
             p.requires_grad = False
 
         self.p_optimizer = p_optimizer
@@ -115,10 +115,12 @@ class DDPG(BaseAgent):
             next_state,
             reward
         )
-        self.replay()
 
-        if self.target_update_step_interval and self.step % self.target_update_step_interval == 0:
-            self._update_target_network()
+        
+        if len(self.replay_buffer) >= self.batch_size:
+            self.replay()
+            if self.target_update_step_interval and self.step % self.target_update_step_interval == 0:
+                self._update_target_network()
             
         self.state = next_state
         self.action = self.explorer.explore(lambda: self._choice_noisy_action(next_state), lambda: self._choice_greedy_action(next_state))
@@ -128,9 +130,6 @@ class DDPG(BaseAgent):
 
 
     def replay(self):
-        if len(self.replay_buffer) < self.batch_size:
-            return
-
         state_batch, next_state_batch, action_batch, reward_batch = self.replay_buffer.get_batch(self.batch_size).values()
         
         
@@ -138,26 +137,27 @@ class DDPG(BaseAgent):
         q_values = self.ac.q(state_batch, action_batch)
 
         with torch.no_grad():
-            q_target = self.ac_target.q(next_state_batch, ac_target.pi(next_state_batch))
-            backup = reward_batch + self.gamma * q_target
+            t = self.ac_target.pi(next_state_batch)
+            target_values = self.ac_target.q(next_state_batch, t)
+            backup = reward_batch + self.gamma * target_values
 
         # MSE Loss
         loss_q = ((q_values - backup)**2).mean()
 
         # 現在の方策を評価
-        loss_pi = - self.ac.q(state_batch, ac.pi(state_batch)).mean()
+        loss_pi = - self.ac.q(state_batch, self.ac.pi(state_batch)).mean()
 
         self.q_optimizer.zero_grad()
         loss_q.backward()
-        q_optimizer.step()
+        self.q_optimizer.step()
 
-        for p in ac.q.parameters():
+        for p in self.ac.q.parameters():
             p.requires_grad = False
 
 
         self.p_optimizer.zero_grad()
         loss_pi.backward()
-        pi_optimizer.step()
+        self.p_optimizer.step()
 
         for p in ac.q.parameters():
             p.requires_grad = True
