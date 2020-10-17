@@ -10,7 +10,7 @@ from copy import deepcopy
 """
 
 
-obs_num = 4 # 仮
+obs_num = 3 # 仮
 node_num = 128 # 仮
 
 class PolicyNetwork(nn.Module):
@@ -77,7 +77,7 @@ class DDPG(BaseAgent):
         noise_scale=0.1,
         polyak=0.995,
         target_update_step_interval=1,
-        target_update_episode_interval=0
+        target_update_episode_interval=1
     ):
         super().__init__(action_space, explorer, gamma=gamma)
 
