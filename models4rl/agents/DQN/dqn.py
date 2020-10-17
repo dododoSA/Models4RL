@@ -59,8 +59,6 @@ class DQN(BaseAgent):
         self.action = None
         self.target_update_step_interval = target_update_step_interval
         self.target_update_episode_interval = target_update_episode_interval
-        self.episode = 1
-        self.step = 1
 
 
     def act_and_train(self, observation, reward):
@@ -144,6 +142,7 @@ class DQN(BaseAgent):
         self.target_network.load_state_dict(self.q_network.state_dict())
 
 
+    # この関数なんであるんだっけ……
     def _choice_greedy_action(self, observation):
         self.q_network.eval()
         with torch.no_grad():
@@ -183,5 +182,5 @@ class DQN(BaseAgent):
 
         self.episode += 1
         
-        if self.episode % self.target_update_episode_interval == 0:
+        if target_update_episode_interval and self.episode % self.target_update_episode_interval == 0:
             self._update_target_network()

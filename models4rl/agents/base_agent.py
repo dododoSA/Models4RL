@@ -10,6 +10,9 @@ class BaseAgent(metaclass=ABCMeta):
         self.explorer = explorer
         self.gamma = gamma
 
+        self.episode = 1
+        self.step = 1
+
 
     @abstractmethod
     def act_and_train(self) -> int:

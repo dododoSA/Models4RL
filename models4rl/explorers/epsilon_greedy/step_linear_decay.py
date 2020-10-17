@@ -11,6 +11,9 @@ class StepLinearDecay(BaseExplorer):
     Examples:
         explorer = EpisodeLinearDecay(decay_steps=100, start_epsilon=0.7, end_epsilon=0.01)
         agent = Agent(explorer=explorer, args...)
+
+    Note:
+        連続行動空間にも対応させたい
     """
 
     def __init__(self, decay_steps:int, start_epsilon:float=1.0, end_epsilon:float=0.0):
