@@ -1,11 +1,13 @@
 from models4rl.agents.q_learning.q_learning import Qlearning
 from models4rl.agents.dqn.dqn import DQN
+from models4rl.agents.ddqn.ddqn import DDQN
 from models4rl.explorers.epsilon_greedy.constant_epsilon import ConstantEpsilon
 from models4rl.explorers.epsilon_greedy.episode_linear_decay import EpisodeLinearDecay
 from models4rl.explorers.epsilon_greedy.step_linear_decay import StepLinearDecay
 from models4rl.explorers.epsilon_greedy.episode_exp_decay import EpisodeExpDecay
 from models4rl.replay_buffers.replay_buffer import ReplayBuffer
 from models4rl.replay_buffers.prioritized_replay_buffer import PrioritizedReplayBuffer
+from models4rl.utils.network_utils import *
 import gym
 import time
 import numpy as np
@@ -24,9 +26,9 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 env = gym.make('CartPole-v0')
 max_steps = 200
-episode_num = 1000
+episode_num = 1500
 
-explorer = EpisodeLinearDecay(700, 0.8, 0)
+explorer = EpisodeLinearDecay(500, 0.7, 0.01)
 #explorer = StepLinearDecay(max_steps - 100, 0.1, 0)
 #explorer = EpisodeExpDecay(a=0.99)
 # explorer = ConstantEpsilon(0.05)
@@ -42,24 +44,25 @@ act_num = 2 # 仮
 class Q_Network(nn.Module):
     def __init__(self):
         super(Q_Network, self).__init__()
-        self.fc1 = nn.Linear(obs_num, node_num)
-        self.fc2 = nn.Linear(node_num, node_num)
-        self.fc3 = nn.Linear(node_num, node_num)
-        self.fc4 = nn.Linear(node_num, act_num)
+      
+        net_sizes = [obs_num] + [node_num] * 2
+
+        self.fc = make_linear_network(net_sizes, nn.ELU, nn.ELU)
+
+        adv_sizes = [node_num] + [act_num]
+        val_sizes = [node_num] + [1]
+        self.adv, self.val = make_dueling_network(adv_sizes, val_sizes, nn.ELU, nn.ELU)
+
 
     def __call__(self, x):
-        h = F.relu(self.fc1(x))
-        h = F.relu(self.fc2(h))
-        h = F.relu(self.fc3(h))
-        y = F.relu(self.fc4(h))
-        return y
+        return dueling_forward(self.fc(x), self.adv, self.val)
 
 q_network = Q_Network()
 optimizer = optim.Adam(q_network.parameters(), lr=0.001)
-criterion = nn.MSELoss()
-#replay_buffer = ReplayBuffer(1000)
-replay_buffer = PrioritizedReplayBuffer(3000)
-agent = DQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_episode_interval=20)
+criterion = nn.SmoothL1Loss()
+replay_buffer = ReplayBuffer(10000)
+agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_episode_interval=15)
+
 
 def compute_reward(reward, done):
     if done:
