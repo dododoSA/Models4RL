@@ -147,7 +147,7 @@ class DQN(BaseAgent):
     def _choice_greedy_action(self, observation):
         self.q_network.eval()
         with torch.no_grad():
-            action = self.q_network(observation).max(0)[1].item()
+            action = self.q_network(observation).max(dim=0)[1].item() # todo: この辺のテンソルの扱いが雑なので注意
         return action
 
 

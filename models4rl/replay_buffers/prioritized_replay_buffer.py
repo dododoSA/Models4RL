@@ -7,7 +7,13 @@ from models4rl.replay_buffers.data_memory.experience_memory import ExperienceMem
 from models4rl.replay_buffers.data_memory.tderror_memory import TDerrorMemory
 
 class PrioritizedReplayBuffer(BaseBuffer):
-    def __init__(self, capacity, start_size=128, epsilon=0.0001):
+    """
+    優先度付き経験再生
+
+    TODO:
+        効率化
+    """
+    def __init__(self, capacity, epsilon=0.0001):
         self.experience_memory = ExperienceMemory(capacity)
         self.tderror_memory = TDerrorMemory(capacity, epsilon)
 
@@ -24,8 +30,8 @@ class PrioritizedReplayBuffer(BaseBuffer):
 
         self.experience_memory.append(transition)
 
-        # バッチサイズ以下の時は無駄な処理な気もするけれど、バッチサイズはせいぜい数百なのでスルー
-        self._update_td_error_memory(keys['q_network'], keys['target_network'], keys['gamma'])
+        if len(self) >= 2: # todo len == 1の時エラーが発生するのを確認 Tensorの扱いが下手なのが原因
+            self._update_td_error_memory(keys['q_network'], keys['target_network'], keys['gamma'])
 
 
     def get_batch(self, batch_size):
@@ -47,7 +53,8 @@ class PrioritizedReplayBuffer(BaseBuffer):
 
         q_network.eval()
 
-        q_values = q_network(state_batch).gather(1, action_batch)
+        tmp = q_network(state_batch)
+        q_values = tmp.gather(1, action_batch)
         
         
         target_network.eval()

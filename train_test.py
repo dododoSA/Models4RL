@@ -52,15 +52,18 @@ class Q_Network(nn.Module):
         adv_sizes = [node_num] + [act_num]
         val_sizes = [node_num] + [1]
         self.adv, self.val = make_dueling_network(adv_sizes, val_sizes, nn.ELU, nn.ELU)
-
+        
+        #self.fc = make_linear_network(net_sizes + [act_num], nn.ELU, nn.ELU)
 
     def __call__(self, x):
-        return dueling_forward(self.fc(x), self.adv, self.val)
+        y = dueling_forward(self.fc(x), self.adv, self.val)
+        return y
 
 q_network = Q_Network()
 optimizer = optim.Adam(q_network.parameters(), lr=0.001)
 criterion = nn.SmoothL1Loss()
-replay_buffer = ReplayBuffer(10000)
+#replay_buffer = ReplayBuffer(10000)
+replay_buffer = PrioritizedReplayBuffer(10000)
 agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_episode_interval=15)
 
 
