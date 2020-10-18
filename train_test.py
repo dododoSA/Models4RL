@@ -6,6 +6,7 @@ from models4rl.explorers.epsilon_greedy.episode_linear_decay import EpisodeLinea
 from models4rl.explorers.epsilon_greedy.step_linear_decay import StepLinearDecay
 from models4rl.explorers.epsilon_greedy.episode_exp_decay import EpisodeExpDecay
 from models4rl.replay_buffers.replay_buffer import ReplayBuffer
+from models4rl.utils.network_utils import *
 import gym
 import time
 import numpy as np
@@ -42,35 +43,18 @@ act_num = 2 # 仮
 class Q_Network(nn.Module):
     def __init__(self):
         super(Q_Network, self).__init__()
-        self.fc1 = nn.Linear(obs_num, node_num)
-        self.fc2 = nn.Linear(node_num, node_num)
-        self.fc3 = nn.Linear(node_num, node_num)
-        self.fc4 = nn.Linear(node_num, act_num)
+      
+        net_sizes = [obs_num] + [node_num] * 2
 
+        self.fc = make_linear_network(net_sizes, nn.ELU, nn.ELU)
 
-        self.adv1 = nn.Linear(node_num, node_num)
-        self.val1 = nn.Linear(node_num, node_num)
-        self.adv2 = nn.Linear(node_num, act_num)
-        self.val2 = nn.Linear(node_num, 1)
+        adv_sizes = [node_num] + [act_num]
+        val_sizes = [node_num] + [1]
+        self.adv, self.val = make_dueling_network(adv_sizes, val_sizes, nn.ELU, nn.ELU)
+
 
     def __call__(self, x):
-        h = F.elu(self.fc1(x))
-        h = F.elu(self.fc2(h))
-        h = F.elu(self.fc3(h))
-        output = F.elu(self.fc4(h))
-
-        #adv = F.elu(self.adv1(h))
-        #val = F.elu(self.val1(h))
-
-        #adv = self.adv2(adv).repeat(1, 1) # この辺なんか変な気がする
-        #val = self.val2(val).repeat(1, act_num)
-
-        #t = adv.mean(1).unsqueeze(1)
-        #t = t.expand(t.size(0), act_num)
-
-        #output = val + adv - t # adv.mean(1).unsqueeze(1).expand(h.xize(0), act_num)
-
-        return output # .squeeze(0)
+        return dueling_forward(self.fc(x), self.adv, self.val)
 
 q_network = Q_Network()
 optimizer = optim.Adam(q_network.parameters(), lr=0.001)
