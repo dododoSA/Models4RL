@@ -8,7 +8,6 @@ class ReplayBuffer():
     https://book.mynavi.jp/manatee/detail/id=89831
     キューっぽくcapacityに達したらデータを削除するようにする方式も考えたけどappendはメモリ確保に時間がかかるっぽいからこれが速そう
     めちゃくちゃ余裕があるならmemoryのデータ構造を自作するのはあり
-    優先度付き経験再生など他の経験再生のために抽象化する可能性あり
     """
     def __init__(self, capacity:int):
         self.capacity = capacity
