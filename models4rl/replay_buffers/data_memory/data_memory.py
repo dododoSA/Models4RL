@@ -28,7 +28,7 @@ class DataMemory():
         return self.get_capacity
 
 
-    def reset_memory(self):
+    def reset(self):
         self.memory = []
         self.index = 0
 

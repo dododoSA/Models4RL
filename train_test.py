@@ -38,7 +38,7 @@ explorer = EpisodeLinearDecay(500, 0.7, 0.01)
 
 
 obs_num = 4 # 仮
-node_num = 128 # 仮
+node_num = 64 # 仮
 act_num = 2 # 仮
 
 class Q_Network(nn.Module):
@@ -55,7 +55,7 @@ class Q_Network(nn.Module):
         
         # self.fc = make_linear_network(net_sizes + [act_num], nn.ELU, nn.ELU)
 
-    def __call__(self, x):
+    def forward(self, x):
         y = dueling_forward(self.fc(x), self.adv, self.val)
         # y = self.fc(x)
         return y
@@ -65,7 +65,7 @@ optimizer = optim.Adam(q_network.parameters(), lr=0.001)
 criterion = nn.SmoothL1Loss()
 replay_buffer = ReplayBuffer(10000)
 # replay_buffer = PrioritizedReplayBuffer(10000)
-agent = DQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_step_interval=50)
+agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_step_interval=50)
 
 
 def compute_reward(reward, done):
