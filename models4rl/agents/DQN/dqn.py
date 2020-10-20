@@ -60,7 +60,7 @@ class DQN(BaseAgent):
         self.target_update_step_interval = target_update_step_interval
         self.target_update_episode_interval = target_update_episode_interval
         self.episode = 1
-        self.step = 1
+        self.step = 1 # エピソードごとではなく総ステップ数
 
 
     def act_and_train(self, observation, reward):

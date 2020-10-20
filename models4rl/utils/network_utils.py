@@ -52,7 +52,7 @@ def dueling_forward(x, adv_seq, val_seq):
     adv = adv_seq(x)
     val = val_seq(x)
 
-    adv = adv.repeat(1, 1)
+    adv = adv.repeat(1, 1) # この辺のテンソルの扱いがへたくそなのでそのうち修正
     val = val.repeat(1, adv.size(1))
 
     tmp = adv.mean(1).unsqueeze(1)

@@ -5,6 +5,12 @@ import numpy as np
 from gym.spaces.discrete import Discrete
 
 class BaseAgent(metaclass=ABCMeta):
+    """
+    エージェントの親クラス
+
+    NOTE:
+        作成当初はoff-policy前提で作ったので、on-policyに対応するべく改良する必要があるかもしれない
+    """
     def __init__(self, action_space:Discrete, explorer:BaseExplorer, gamma:float=0.99):
         self.action_space = action_space
         self.explorer = explorer

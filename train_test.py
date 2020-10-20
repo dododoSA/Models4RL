@@ -26,7 +26,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 env = gym.make('CartPole-v0')
 max_steps = 200
-episode_num = 1500
+episode_num = 1000
 
 explorer = EpisodeLinearDecay(500, 0.7, 0.01)
 #explorer = StepLinearDecay(max_steps - 100, 0.1, 0)
@@ -53,18 +53,19 @@ class Q_Network(nn.Module):
         val_sizes = [node_num] + [1]
         self.adv, self.val = make_dueling_network(adv_sizes, val_sizes, nn.ELU, nn.ELU)
         
-        #self.fc = make_linear_network(net_sizes + [act_num], nn.ELU, nn.ELU)
+        # self.fc = make_linear_network(net_sizes + [act_num], nn.ELU, nn.ELU)
 
     def __call__(self, x):
         y = dueling_forward(self.fc(x), self.adv, self.val)
+        # y = self.fc(x)
         return y
 
 q_network = Q_Network()
 optimizer = optim.Adam(q_network.parameters(), lr=0.001)
 criterion = nn.SmoothL1Loss()
-#replay_buffer = ReplayBuffer(10000)
-replay_buffer = PrioritizedReplayBuffer(10000)
-agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_episode_interval=15)
+replay_buffer = ReplayBuffer(10000)
+# replay_buffer = PrioritizedReplayBuffer(10000)
+agent = DQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_step_interval=50)
 
 
 def compute_reward(reward, done):
