@@ -1,7 +1,7 @@
 class DataMemory():
     def __init__(self, capacity:int=None):
         self.capacity = capacity
-        self.reset_memory()
+        self.reset()
 
     def append(self, data):
 

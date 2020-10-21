@@ -16,7 +16,7 @@ class DQN(BaseAgent):
         action_space:Discrete,
         q_network:Module,
         optimizer:Optimizer,
-        criterion:Module,
+        criterion, # こいつをどうするか DDQNも
         explorer:BaseExplorer,
         replay_buffer:ReplayBuffer,
         batch_size:int=32,

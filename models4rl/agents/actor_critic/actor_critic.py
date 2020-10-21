@@ -37,15 +37,20 @@ class ActorCriticNetwork(nn.Module):
         super().__init__()
         self.p = PolicyNetwork()
         self.q = QNetwork()
-        self.criterion = F.SmoothL1Loss()
 
 
+import torch.optim as optim
+from torch.distributions import Categorical
 
 class ActorCritic(BaseAgent):
     def __init__(self, action_space, gamma=0.99):
         super().__init__(action_space, None, gamma)
-        self.optimizer = optimizer
-        self.ac_network = ac_network
+        self.ac_network = ActorCriticNetwork()
+        self.criterion = F.smooth_l1_loss
+
+        self.p_optimizer = optim.Adam(self.ac_network.p.parameters(), lr=0.0005) # optimizer
+        self.q_optimizer = optim.Adam(self.ac_network.q.parameters())
+
         self.trans_memory = DataMemory() # トランジションを保存するメモリ、ExperienceMemoryは経験再生用なのでこちらを使用
 
         self.state = None
@@ -100,18 +105,24 @@ class ActorCritic(BaseAgent):
             r = trans["reward"]
             s = trans["state"]
             v = self.ac_network.q(s)
+            action_prob = self.ac_network.p(s)[trans["action"]]
 
             R = r + self.gamma * R
             advantage = R - v
-            actor_loss -= torch.log(self.ac_network.p(s)) * advantage
+            actor_loss -= torch.log(action_prob) * advantage
             critic_loss += self.criterion(v, torch.tensor(R))
 
-        actor_loss = actor_loss/len(self.data_memory)
-        critic_loss = critic_loss/len(self.data_memory)
-        self.optimizer.zero_grad()
-        loss = actor_loss + critic_loss
-        loss.backward()
-        self.optimizer.step()
+        actor_loss = actor_loss/len(self.trans_memory)
+        critic_loss = critic_loss/len(self.trans_memory)
+        
+        self.p_optimizer.zero_grad()
+        actor_loss.backward(retain_graph=True)
+        self.p_optimizer.step()
+        
+        self.q_optimizer.zero_grad()
+        critic_loss.backward()
+        self.q_optimizer.step()
+
 
 
     def act_greedily(self, observation):
@@ -123,8 +134,9 @@ class ActorCritic(BaseAgent):
         """
         この関数まじでどうしよう
         """
-        action_prob = self.ac_network(next_state)
-        action = torch.argmax(action_prob.squeeze().data).item()
+        action_prob = self.ac_network.p(observation)
+        # action = torch.argmax(action_prob.squeeze().data).item()
+        action = Categorical(action_prob).sample().item()
         return action
 
 

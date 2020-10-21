@@ -1,6 +1,7 @@
 from models4rl.agents.q_learning.q_learning import Qlearning
 from models4rl.agents.dqn.dqn import DQN
 from models4rl.agents.ddqn.ddqn import DDQN
+from models4rl.agents.actor_critic.actor_critic import ActorCritic
 from models4rl.explorers.epsilon_greedy.constant_epsilon import ConstantEpsilon
 from models4rl.explorers.epsilon_greedy.episode_linear_decay import EpisodeLinearDecay
 from models4rl.explorers.epsilon_greedy.step_linear_decay import StepLinearDecay
@@ -26,7 +27,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 env = gym.make('CartPole-v0')
 max_steps = 200
-episode_num = 1000
+episode_num = 1500
 
 explorer = EpisodeLinearDecay(500, 0.7, 0.01)
 #explorer = StepLinearDecay(max_steps - 100, 0.1, 0)
@@ -65,8 +66,8 @@ optimizer = optim.Adam(q_network.parameters(), lr=0.001)
 criterion = nn.SmoothL1Loss()
 replay_buffer = ReplayBuffer(10000)
 # replay_buffer = PrioritizedReplayBuffer(10000)
-agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_step_interval=50)
-
+# agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_step_interval=50)
+agent = ActorCritic(env.action_space)
 
 def compute_reward(reward, done):
     if done:
@@ -77,6 +78,7 @@ def compute_reward(reward, done):
     return reward
 
 queue = []
+
 ave_10_episodes_reward = []
 
 for episode in range(episode_num):
