@@ -58,3 +58,44 @@ def dueling_forward(x, adv_seq, val_seq):
     tmp = adv.mean(1).unsqueeze(1)
     output = val + adv - tmp.expand(tmp.size(0), adv.size(1))
     return output.squeeze(0)
+
+
+
+
+# ==================== Actor Critic ======================
+# 出来たら整理したい
+
+class QNetwork(nn.Module): # よくよく考えたらqじゃなくてvな気がしてきた
+    def __init__(self, sizes):
+        super().__init__()
+        # example
+        # sizes = [state_num] + [hidden_size] * 2 + [1]
+        self.fc = make_linear_network(sizes, nn.ELU, nn.ELU)
+
+    def forward(self, x):
+        return self.fc(x)
+
+
+class PolicyNetwork(nn.Module):
+    def __init__(self, sizes):
+        super().__init__()
+        # example
+        # sizes = [state_num] + [hidden_size] + [action_num]
+        self.fc = make_linear_network(sizes, nn.ELU, nn.Softmax)
+
+    def forward(self, x):
+        return self.fc(x)
+
+
+class ACNetwork(nn.Module):
+    """
+    価値を推定するネットワークと方策を学習するネットワークを完全別個として定義
+    """
+    def __init__(self, q_sizes, p_sizes):
+        super().__init__()
+        self.p = PolicyNetwork(p_sizes)
+        self.q = QNetwork(q_sizes)
+
+
+def create_ac_network(q_sizes, p_sizes):
+    return ACNetwork(q_sizes, p_sizes)

@@ -4,52 +4,22 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models4rl.utils.network_utils import make_linear_network
-
-state_num = 4
-action_num = 2
-hidden_size = 64
-
-
-class QNetwork(nn.Module):
-    def __init__(self):
-        super().__init__()
-        
-        sizes = [state_num] + [hidden_size] * 2 + [1]
-        self.fc = make_linear_network(sizes, nn.ELU, nn.ELU)
-
-    def forward(self, x):
-        return self.fc(x)
-
-
-class PolicyNetwork(nn.Module):
-    def __init__(self):
-        super().__init__()
-        sizes = [state_num] + [hidden_size] + [action_num]
-        self.fc = make_linear_network(sizes, nn.ELU, nn.Softmax)
-
-    def forward(self, x):
-        return self.fc(x)
-
-
-class ActorCriticNetwork(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.p = PolicyNetwork()
-        self.q = QNetwork()
 
 
 import torch.optim as optim
 from torch.distributions import Categorical
 
 class ActorCritic(BaseAgent):
-    def __init__(self, action_space, gamma=0.99):
+    def __init__(self, action_space, ac_network, p_optimizer, q_optimizer, criterion=F.smooth_l1_loss, gamma=0.99):
+        """
+        ac_networkはnetwork_utilsから定義
+        """
         super().__init__(action_space, None, gamma)
-        self.ac_network = ActorCriticNetwork()
-        self.criterion = F.smooth_l1_loss
+        self.ac_network = ac_network
+        self.criterion = criterion
 
-        self.p_optimizer = optim.Adam(self.ac_network.p.parameters(), lr=0.0005) # optimizer
-        self.q_optimizer = optim.Adam(self.ac_network.q.parameters())
+        self.p_optimizer = p_optimizer
+        self.q_optimizer = q_optimizer
 
         self.trans_memory = DataMemory() # トランジションを保存するメモリ、ExperienceMemoryは経験再生用なのでこちらを使用
 
@@ -88,7 +58,7 @@ class ActorCritic(BaseAgent):
             reward
         )
 
-        self.update()
+        self.batch_update()
 
         self.trans_memory.reset()
         self.state = None
@@ -97,7 +67,7 @@ class ActorCritic(BaseAgent):
         self.episode += 1
 
 
-    def update(self):
+    def batch_update(self):
         R = 0
         actor_loss = 0
         critic_loss = 0
