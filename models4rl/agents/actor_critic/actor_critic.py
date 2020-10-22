@@ -10,7 +10,11 @@ import torch.optim as optim
 from torch.distributions import Categorical
 
 class ActorCritic(BaseAgent):
-    def __init__(self, action_space, ac_network, p_optimizer, q_optimizer, criterion=F.smooth_l1_loss, gamma=0.99):
+    """
+    Advanced ActorCritic
+    エントロピー項なし
+    """
+    def __init__(self, action_space, ac_network, p_optimizer, q_optimizer, criterion=F.smooth_l1_loss, n_step=5, gamma=0.99):
         """
         ac_networkはnetwork_utilsから定義
         """
@@ -27,6 +31,7 @@ class ActorCritic(BaseAgent):
         self.action = None
         self.episode = 1
         self.step = 1
+        self.n_step = n_step
 
 
     def act_and_train(self, observation, reward):
@@ -38,6 +43,9 @@ class ActorCritic(BaseAgent):
             next_state,
             reward
         )
+
+        if self.step % self.n_step == 0:
+            self.update()
         
         self.state = next_state
         self.action = self._choice_greedy_action(next_state)
@@ -58,32 +66,43 @@ class ActorCritic(BaseAgent):
             reward
         )
 
-        self.batch_update()
+        self.update(True)
 
-        self.trans_memory.reset()
         self.state = None
         self.action = None
 
         self.episode += 1
 
 
-    def batch_update(self):
-        R = 0
+    def update(self, is_terminal=False):
+        if len(self.trans_memory) == 0:
+            return
+
+
+        if is_terminal:
+            Q = 0
+        else:
+            terminal = self.trans_memory.get_latest_memories(1)[0]     
+            Q = self.ac_network.q(terminal["next_state"])
+
         actor_loss = 0
         critic_loss = 0
+        R = 0
+        # 計算式:https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html#baselines-in-policy-gradients
+        # Rを逆から計算しているのがポイント
         for trans in self.trans_memory.get_latest_memories():
             r = trans["reward"]
             s = trans["state"]
             v = self.ac_network.q(s)
             action_prob = self.ac_network.p(s)[trans["action"]]
 
-            R = r + self.gamma * R
-            advantage = R - v
+            Q = r + self.gamma * Q
+            advantage = Q - v
+            critic_loss += self.criterion(v, torch.tensor(Q))
             actor_loss -= torch.log(action_prob) * advantage
-            critic_loss += self.criterion(v, torch.tensor(R))
 
-        actor_loss = actor_loss/len(self.trans_memory)
         critic_loss = critic_loss/len(self.trans_memory)
+        actor_loss = actor_loss/len(self.trans_memory)
         
         self.p_optimizer.zero_grad()
         actor_loss.backward(retain_graph=True)
@@ -92,7 +111,8 @@ class ActorCritic(BaseAgent):
         self.q_optimizer.zero_grad()
         critic_loss.backward()
         self.q_optimizer.step()
-
+        
+        self.trans_memory.reset() # on-policyなのでpolicyが更新されたらデータを破棄
 
 
     def act_greedily(self, observation):

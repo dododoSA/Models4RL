@@ -33,6 +33,16 @@ class DataMemory():
         self.index = 0
 
 
+    def head(self, num=None):
+        """
+        先頭からn個のデータを配列で返す
+        """
+        if num is None:
+            n = len(self)
+
+        return self.memory[0:n]
+
+
     def get_latest_memories(self, num=None):
         """
         新しい順にメモリーを取り出す関数
@@ -43,3 +53,8 @@ class DataMemory():
 
         reversed_memory = self.memory[::-1]
         return reversed_memory[0:num]
+
+
+    def pop(self, n):
+        n %= len(self.memory)
+        self.memory.pop(n)

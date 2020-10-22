@@ -68,11 +68,11 @@ replay_buffer = ReplayBuffer(10000)
 # replay_buffer = PrioritizedReplayBuffer(10000)
 # agent = DDQN(env.action_space, q_network, optimizer, criterion, explorer, replay_buffer, target_update_step_interval=50)
 
-p_sizes = [state_num] + [hidden_size] + [action_num]
-q_sizes = [state_num] + [hidden_size] * 2 + [1]
+p_sizes = [obs_num] + [node_num] + [act_num]
+q_sizes = [obs_num] + [node_num] * 2 + [1]
 ac_network = create_ac_network(q_sizes, p_sizes)
 p_optimizer = optim.Adam(ac_network.p.parameters(), lr=0.0005)
-q_optimizer = optim.Adam(ac_network.q.parameters(), lr=0.0005)
+q_optimizer = optim.Adam(ac_network.q.parameters(), lr=0.001)
 agent = ActorCritic(env.action_space, ac_network, p_optimizer, q_optimizer)
 
 def compute_reward(reward, done):
