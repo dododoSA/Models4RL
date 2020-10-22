@@ -12,7 +12,7 @@ from torch.distributions import Categorical
 class ActorCritic(BaseAgent):
     """
     Advanced ActorCritic
-    エントロピー項なし
+    エントロピー項なし→パラメータで設定できるようにしたらクラス名をAdvanceActorCriticとかにしてもいいかもしれない
     """
     def __init__(self, action_space, ac_network, p_optimizer, q_optimizer, criterion=F.smooth_l1_loss, n_step=5, gamma=0.99):
         """
